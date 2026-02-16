@@ -201,12 +201,12 @@ h4 {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 70px;
-    height: 70px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 4px;
-    /* Reduced padding for larger logo fit */
+    padding: 5px;
+    /* Adjusted padding for smaller 50px circle */
     transition: all 0.3s ease;
     background: transparent;
 }
