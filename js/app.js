@@ -77,10 +77,6 @@ projects.forEach(project => {
 
 /* Audio Player Logic */
 const audio = new Audio();
-audio.addEventListener('error', (e) => {
-    alert("Audio File Error: " + (audio.error ? audio.error.message : "Unknown"));
-    console.error("Audio error:", audio.error);
-});
 const playerBar = document.querySelector('.audio-player-bar');
 const playPauseBtn = document.querySelector('.play-pause-btn');
 const playIcon = playPauseBtn.querySelector('span');
@@ -109,10 +105,7 @@ function playTrackByIndex(index) {
     const title = project.querySelector('.project-title').innerText;
 
     audio.src = src;
-    audio.play().catch(e => {
-        console.log("Audio play failed:", e);
-        alert("Debug Error: " + e.message);
-    });
+    audio.play().catch(e => console.log("Audio play failed (interaction needed):", e));
     isPlaying = true;
 
     updatePlayerUI(true, title);
@@ -1064,6 +1057,11 @@ if (videoModal && modalVideoPlayer) {
                 }
 
                 modalVideoPlayer.src = videoSrc;
+
+                // Reset Seeker & Time immediately
+                if (videoSeekBar) videoSeekBar.style.width = '0%';
+                if (videoTimeDisplay) videoTimeDisplay.textContent = '0:00 / 0:00';
+
                 videoModal.classList.add('active');
                 videoModalActive = true; // Disable particle trail
                 delay = DELAY_SNAP; // Cursor follows instantly in modal
@@ -1103,6 +1101,9 @@ if (videoModal && modalVideoPlayer) {
         if (videoPlayBtn) {
             videoPlayBtn.innerHTML = '<span class="icon-play">&#9654;</span>';
         }
+        // Reset Seeker & Time
+        if (videoSeekBar) videoSeekBar.style.width = '0%';
+        if (videoTimeDisplay) videoTimeDisplay.textContent = '0:00 / 0:00';
     }
 
     // Play/Pause Toggle
