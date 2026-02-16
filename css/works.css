@@ -370,8 +370,8 @@
 }
 
 .gallery-item {
-    flex: 0 0 clamp(300px, 22vw, 500px);
-    /* Fluid width: Min 300px, Target 22% viewport, Max 500px */
+    flex: 0 0 clamp(240px, 17.5vw, 500px);
+    /* Laptop (1366px) ~= 240px, Desktop (1920px) ~= 336px */
     /* Fixed width poster */
     scroll-snap-align: center;
     cursor: none;
