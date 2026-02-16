@@ -1368,52 +1368,47 @@ if (toolsStrip) {
     toolsObserver.observe(toolsStrip);
 }
 
-// Mobile: auto-scroll for gallery (Carousel effect)
+// Mobile: Continuous smooth auto-scroll for gallery
 if (window.innerWidth <= 768) {
     const galleryContainer = document.querySelector('#visual-works .gallery-scroll-container');
     if (galleryContainer) {
-        let scrollInterval;
         let userInteracted = false;
+        let animationId;
+        const speed = 0.5; // Pixels per frame (adjust for speed)
 
-        const startAutoScroll = () => {
-            if (userInteracted || scrollInterval) return;
+        const scrollLoop = () => {
+            if (userInteracted) return;
 
-            scrollInterval = setInterval(() => {
-                // If user touched it, stop everything (safety check)
-                if (userInteracted) {
-                    clearInterval(scrollInterval);
-                    return;
-                }
+            // Increment scroll
+            galleryContainer.scrollLeft += speed;
 
-                const maxScroll = galleryContainer.scrollWidth - galleryContainer.clientWidth;
-                // If at end, loop back. Else, scroll forward one item width (approx 300px with gap)
-                // Using 260px (240px item + 20px gap) approx
-                if (galleryContainer.scrollLeft >= maxScroll - 10) {
-                    galleryContainer.scrollTo({ left: 0, behavior: 'smooth' });
-                } else {
-                    galleryContainer.scrollBy({ left: 260, behavior: 'smooth' });
-                }
-            }, 2000); // 2 second timing
+            // Check if reached end
+            if (galleryContainer.scrollLeft >= galleryContainer.scrollWidth - galleryContainer.clientWidth - 1) {
+                galleryContainer.scrollLeft = 0; // Snap back to start (Loop)
+            }
+
+            animationId = requestAnimationFrame(scrollLoop);
         };
 
         const stopAutoScroll = () => {
             userInteracted = true;
-            clearInterval(scrollInterval);
+            cancelAnimationFrame(animationId);
         };
 
         // Stop on any user touch/scroll interaction
         galleryContainer.addEventListener('touchstart', stopAutoScroll, { passive: true });
         galleryContainer.addEventListener('mousedown', stopAutoScroll);
 
-        // Also stop if they scroll manually (optional, but touchstart covers most mobile intent)
-        // We use IntersectionObserver to only auto-scroll when visible
+        // Start only when visible
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting && !userInteracted) {
-                    startAutoScroll();
+                    // Start loop
+                    if (!animationId) scrollLoop();
                 } else {
-                    clearInterval(scrollInterval);
-                    scrollInterval = null;
+                    // Pause loop (but don't set userInteracted, so it resumes if they scroll away and back)
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
                 }
             });
         }, { threshold: 0.5 });
