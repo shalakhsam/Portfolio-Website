@@ -349,8 +349,8 @@
 
 .gallery-scroll-container {
     display: flex;
-    justify-content: flex-start;
-    /* align items to start for scroll */
+    justify-content: center;
+    /* Center by default, switch to flex-start on smaller screens for scroll */
     overflow-x: auto;
     gap: var(--spacing-lg);
     padding: var(--spacing-md) 0 var(--spacing-xl) 0;
@@ -773,10 +773,24 @@
 
 /* Mobile for Gallery & Video Controls */
 
+/* Intermediate Breakpoint: Switch to left-align/scroll before the items Clip */
+@media (max-width: 1650px) {
+    .gallery-scroll-container {
+        justify-content: flex-start;
+        padding-left: var(--spacing-md);
+        padding-right: var(--spacing-md);
+    }
+}
+
 /* Laptop Responsive (1440px and below) */
 @media (max-width: 1440px) {
     .gallery-item {
         flex: 0 0 240px;
+    }
+
+    /* Ensure scroll container is left-aligned here too */
+    .gallery-scroll-container {
+        justify-content: flex-start;
     }
 }
 
