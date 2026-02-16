@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shalakh Sam Varughese | Composer for Visual Media</title>
+    <meta name="description" content="Portfolio of Shalakh Sam Varughese, Composer for Visual Media.">
+
+    <!-- Typography: Playfair Display (Serif/Titles), Inter (Sans/Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/works.css">
+    <link rel="stylesheet" href="css/contact.css">
+    <link rel="stylesheet" href="css/footer.css">
+
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function () {
+            // Initialize EmailJS with Public Key
+            emailjs.init("ku49fcOBKT22ofxVw");
+        })();
+    </script>
+</head>
+
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- Background Canvas -->
+    <canvas id="starfield"></canvas>
+    <canvas id="trail-canvas"></canvas>
+
+    <!-- Navigation -->
+    <!-- Navigation -->
+    <nav class="nav-overlay">
+        <a href="#" class="logo">SSV</a>
+        <ul class="nav-links">
+            <li><a href="#about" class="nav-item">About</a></li>
+            <li><a href="#work" class="nav-item">Works</a></li>
+            <li><a href="#contact" class="nav-item">Contact</a></li>
+        </ul>
+
+        <!-- Mobile Hamburger -->
+        <div class="hamburger">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay">
+        <!-- Close Button -->
+        <div class="mobile-menu-close">&times;</div>
+
+        <ul class="mobile-nav-links">
+            <li><a href="#about" class="mobile-nav-item">About</a></li>
+            <li><a href="#work" class="mobile-nav-item">Works</a></li>
+            <li><a href="#contact" class="mobile-nav-item">Contact</a></li>
+        </ul>
+        <!-- Footer Content Moved Here -->
+        <div class="mobile-footer-info">
+            <p>&copy; 2026 SSV</p>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <header class="hero-section scroll-animate">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="reveal-text">Shalakh</span>
+                <span class="reveal-text">Sam</span>
+                <span class="reveal-text">Varughese</span>
+            </h1>
+            <p class="hero-subtitle reveal-text-delayed">Composer for Visual Media</p>
+        </div>
+        <div class="scroll-indicator">
+            <span>Scroll</span>
+            <div class="line"></div>
+        </div>
+    </header>
+
+    <!-- About Section -->
+    <!-- About Section -->
+    <section id="about" class="section about-section">
+        <div class="section-header scroll-animate scroll-hidden-bottom">
+            <span class="section-label">About</span>
+        </div>
+        <div class="about-content scroll-animate scroll-hidden-bottom" style="padding: 0 var(--spacing-md);">
+            <p>
+                I am Shalakh Sam Varughese, a composer from Kerala, India, based in Boston, MA. My passion for film
+                music began early,
+                shaped by iconic scores like <em>Harry Potter and the Sorcerer's Stone</em>. As a composer, my goal is
+                to create music that elevates a scene without overshadowing the story.
+            </p>
+            <p>
+                Currently, I am completing my Bachelor's degree in Film Scoring at Berklee College of Music. Alongside
+                my studies, I work with composer Akram Haddad (orchestrator for <em>Assassin's Creed Mirage</em>),
+                assisting with arranging, orchestrating, and preparing professional scores. I also serve as Supervisor
+                and Technology Assistant for the Ensemble Department, managing auditions and contributing to the
+                development of the department's flagship app.
+            </p>
+            <p>
+                In addition to my film scoring studies, I am expanding into game scoring and sound design. I primarily
+                play piano but my expertise expands to other instruments like organ, guitar, ukulele, drums, bongos and
+                basic violin. This versatility brings a strong understanding of how different instruments function in an
+                orchestra.
+            </p>
+            <p>
+                I am looking to collaborate with filmmakers and developers who value music as an integral, intentional
+                part in the narrative experience.
+            </p>
+
+            <div class="tools-strip">
+                <span class="tools-label">Tools I Work With</span>
+                <div class="tools-logos">
+                    <img src="assets/Logos/1.png" alt="Software" title="Software">
+                    <img src="assets/Logos/2.jpg" alt="Software" title="Software">
+                    <img src="assets/Logos/3.png" alt="Software" title="Software">
+                    <img src="assets/Logos/4.png" alt="Software" title="Software">
+                    <img src="assets/Logos/5.png" alt="Software" title="Software">
+                    <img src="assets/Logos/6.jpg" alt="Software" title="Software">
+                </div>
+            </div>
+
+            <div class="about-read-more-wrapper" id="aboutReadMoreWrapper">
+                <button class="about-read-more" id="aboutReadMore">Read More</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Works Section -->
+    <!-- Removed scroll-animate from parent -->
+    <section id="work" class="section work-section">
+        <!-- Header animates separately -->
+        <div class="works-header-container scroll-animate scroll-hidden-bottom">
+            <div class="section-header">
+                <span class="section-label">Selected Works</span>
+            </div>
+
+            <!-- Centered Liquid Glass Toggle -->
+            <div class="toggle-wrapper">
+                <div class="work-toggle liquid-glass">
+                    <button class="toggle-btn active" data-type="visual">Video Rescores</button>
+                    <button class="toggle-btn" data-type="audio">Audio</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISUAL WORKS (Horizontal Gallery) -->
+        <div id="visual-works" class="works-container active">
+            <div class="gallery-scroll-container">
+                <!-- Video 1 -->
+                <div class="gallery-item scroll-animate scroll-hidden-bottom"
+                    data-video-src="assets/Videos/Shalakh - Fast and Furious SpyRacers Rescore.mp4">
+                    <div class="gallery-poster" style="background-image: url('assets/Posters/FFSP.jpg');">
+                        <div class="gallery-overlay">
+                            <span class="play-icon">&#9654;</span>
+                        </div>
+                    </div>
+                    <div class="gallery-info">
+                        <h3>Fast & Furious: Spy Racers</h3>
+                        <span>Rescore</span>
+                    </div>
+                </div>
+
+                <!-- Video 2 -->
+                <div class="gallery-item scroll-animate scroll-hidden-bottom"
+                    data-video-src="assets/Videos/Shalakh - Incredibles Rescore.mp4">
+                    <div class="gallery-poster" style="background-image: url('assets/Posters/The Incredibles.jpg');">
+                        <div class="gallery-overlay">
+                            <span class="play-icon">&#9654;</span>
+                        </div>
+                    </div>
+                    <div class="gallery-info">
+                        <h3>The Incredibles</h3>
+                        <span>Rescore</span>
+                    </div>
+                </div>
+
+                <!-- Video 3 -->
+                <div class="gallery-item scroll-animate scroll-hidden-bottom"
+                    data-video-src="assets/Videos/Shalakh - No Country For Old Men Rescore.mp4">
+                    <div class="gallery-poster" style="background-image: url('assets/Posters/NCFOM.jpg');">
+                        <div class="gallery-overlay">
+                            <span class="play-icon">&#9654;</span>
+                        </div>
+                    </div>
+                    <div class="gallery-info">
+                        <h3>No Country For Old Men</h3>
+                        <span>Rescore</span>
+                    </div>
+                </div>
+
+                <!-- Video 4 -->
+                <div class="gallery-item scroll-animate scroll-hidden-bottom"
+                    data-video-src="assets/Videos/Shalakh - Shape of Water Rescore.mp4">
+                    <div class="gallery-poster" style="background-image: url('assets/Posters/SOW.jpg');">
+                        <div class="gallery-overlay">
+                            <span class="play-icon">&#9654;</span>
+                        </div>
+                    </div>
+                    <div class="gallery-info">
+                        <h3>The Shape of Water</h3>
+                        <span>Rescore</span>
+                    </div>
+                </div>
+
+                <!-- Video 5 -->
+                <div class="gallery-item scroll-animate scroll-hidden-bottom"
+                    data-video-src="assets/Videos/Shalakh - Shape of Water Soundalike.mp4">
+                    <div class="gallery-poster" style="background-image: url('assets/Posters/SOW.jpg');">
+                        <div class="gallery-overlay">
+                            <span class="play-icon">&#9654;</span>
+                        </div>
+                    </div>
+                    <div class="gallery-info">
+                        <h3>The Shape of Water (Soundalike)</h3>
+                        <span>Rescore</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AUDIO WORKS (List) -->
+        <div id="audio-works" class="works-container">
+            <div class="project-list compact">
+                <!-- Track 1 -->
+                <div class="project-wrapper scroll-animate scroll-hidden-bottom">
+                    <div class="project-item" data-audio="assets/Audio Tracks/Adventure Theme.wav">
+                        <div class="project-info">
+                            <h2 class="project-title">Adventure Theme</h2>
+                            <span class="project-duration">1:36</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Track 2 -->
+                <div class="project-wrapper scroll-animate scroll-hidden-bottom">
+                    <div class="project-item" data-audio="assets/Audio Tracks/Battlecry.wav">
+                        <div class="project-info">
+                            <h2 class="project-title">Battlecry</h2>
+                            <span class="project-duration">0:25</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Track 3 -->
+                <div class="project-wrapper scroll-animate scroll-hidden-bottom">
+                    <div class="project-item" data-audio="assets/Audio Tracks/Coming Home.wav">
+                        <div class="project-info">
+                            <h2 class="project-title">Coming Home</h2>
+                            <span class="project-duration">0:23</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Dynamic Background Container -->
+        <div class="project-preview-bg"></div>
+    </section>
+
+    <!-- Global Audio Player (Fixed Bottom) -->
+    <div class="audio-player-bar">
+        <div class="player-controls">
+            <!-- Controls -->
+            <button class="control-btn prev-btn" aria-label="Previous">
+                <span>&#171;</span>
+            </button>
+
+            <button class="control-btn play-pause-btn" aria-label="Play/Pause">
+                <span class="icon-play">&#9654;</span> <!-- Play Triangle -->
+            </button>
+
+            <button class="control-btn next-btn" aria-label="Next">
+                <span>&#187;</span>
+            </button>
+
+            <div class="track-info">Select a Track</div>
+        </div>
+
+        <div class="seek-container">
+            <div class="seek-bar"></div>
+        </div>
+
+        <div class="volume-container">
+            <button class="control-btn volume-btn" aria-label="Mute/Unmute">
+                <svg class="volume-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
+            </button>
+            <div class="volume-slider-wrapper">
+                <div class="volume-track"></div>
+                <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="1" aria-label="Volume">
+            </div>
+        </div>
+
+        <div class="waveform-visualizer">
+            <!-- Canvas or CSS bars will go here -->
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section contact-section">
+        <div class="contact-scroll-wrapper scroll-animate scroll-hidden-bottom">
+            <div class="contact-container">
+                <!-- Header -->
+                <div class="contact-header">
+                    <h2 class="contact-title">Let’s Collaborate.</h2>
+                    <p class="contact-subtitle">Have a project in mind? Drop me a line.</p>
+                </div>
+
+                <!-- Form -->
+                <form class="contact-form" id="contactForm">
+                    <div class="form-group">
+                        <input type="text" class="form-input" id="name" placeholder="Name" required>
+                        <span class="error-msg">Please enter your name</span>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-input" id="email" placeholder="Email" required>
+                        <span class="error-msg">Please enter a valid email</span>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-input" id="message" placeholder="Message" required></textarea>
+                        <span class="error-msg">Please enter a message</span>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-input" id="link" placeholder="Link to Work (Optional)">
+                    </div>
+                    <button type="submit" class="submit-btn" disabled>Send Message</button>
+                </form>
+
+                <!-- Success Message -->
+                <div class="success-message" id="successMessage">
+                    <span class="success-icon">&#10003;</span>
+                    <div class="success-text">Message received.<br>Shalakh will be in touch shortly.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <!-- Removed id="contact" from footer as it moved to section -->
+    <footer class="footer-section scroll-animate scroll-hidden-bottom">
+        <div class="footer-content">
+            <div class="footer-top">
+                <a href="#" class="footer-logo">SSV</a>
+                <div class="footer-nav">
+                    <a href="#about" class="footer-link">About</a>
+                    <a href="#work" class="footer-link">Work</a>
+                    <a href="#contact" class="footer-link">Contact</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <span class="footer-name">Shalakh Sam Varughese</span>
+                <span class="copyright">&copy; 2026 All Rights Reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Video Modal (Lightbox) -->
+    <div id="video-modal" class="video-modal-overlay">
+        <button class="modal-close-btn">&times;</button>
+        <div class="modal-content">
+            <div class="video-title"></div>
+            <video id="modal-video-player">
+                <source src="" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="video-controls">
+                <button class="video-play-btn" aria-label="Play/Pause">
+                    <span class="icon-play">&#9654;</span>
+                </button>
+                <span class="video-time">0:00 / 0:00</span>
+                <div class="video-seek-container">
+                    <div class="video-seek-bar"></div>
+                </div>
+                <div class="video-volume-container">
+                    <button class="video-volume-btn" aria-label="Mute/Unmute">
+                        <svg class="volume-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                        </svg>
+                    </button>
+                    <div class="video-volume-slider-wrapper">
+                        <input type="range" class="video-volume-slider" min="0" max="1" step="0.01" value="1"
+                            aria-label="Volume">
+                    </div>
+                </div>
+                <button class="video-fullscreen-btn" aria-label="Fullscreen">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <polyline points="9 21 3 21 3 15"></polyline>
+                        <line x1="21" y1="3" x2="14" y2="10"></line>
+                        <line x1="3" y1="21" x2="10" y2="14"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>

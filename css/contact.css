@@ -1,0 +1,237 @@
+/* Contact Section (Liquid Glass) */
+.contact-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    /* Give it space */
+    padding: var(--spacing-xl) var(--spacing-md);
+    position: relative;
+    z-index: 10;
+}
+
+/* Wrapper for Scroll Animation */
+.contact-scroll-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    backface-visibility: hidden;
+}
+
+/* Floating Glass Box */
+.contact-container {
+    width: 100%;
+    max-width: 600px;
+    padding: var(--spacing-lg);
+
+    /* Liquid Glass Effect */
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px) saturate(150%);
+    -webkit-backdrop-filter: blur(8px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.5),
+        inset 0 0 30px rgba(255, 255, 255, 0.02);
+
+    /* GPU layer promotion for smooth scrolling */
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    /* overflow: hidden; Removed to prevent clipping */
+    min-height: 400px;
+    /* Ensure height doesn't collapse */
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.contact-header {
+    margin-bottom: var(--spacing-md);
+}
+
+.contact-title {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-text-primary);
+}
+
+.contact-subtitle {
+    font-family: var(--font-serif);
+    /* Changed to Serif */
+    font-style: italic;
+    /* Added Italic for flair */
+    color: var(--color-text-secondary);
+    font-size: 1.1rem;
+    letter-spacing: 0.02em;
+}
+
+/* Form Styles */
+.contact-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    transition: opacity 0.5s ease;
+}
+
+.form-group {
+    position: relative;
+}
+
+.form-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    /* Slight background */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    /* Full border */
+    border-radius: 4px;
+    /* Slight rounding */
+    padding: 12px 16px;
+    /* Box padding */
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease;
+}
+
+/* Visual Feedback */
+.form-input.error {
+    border-color: #ff4d4d;
+    background: rgba(255, 77, 77, 0.05);
+}
+
+.error-msg {
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    color: #ff4d4d;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: all 0.2s ease;
+    pointer-events: none;
+}
+
+.form-input.error+.error-msg {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Visual Feedback for Invalid/Valid */
+/* Rules removed to prevent aggressive red border while typing. 
+   Validation is now strictly handled by JS events (blur/input). */
+
+.form-input:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+    /* Lighten bg on hover */
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+    /* Subtle glow */
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    /* Gold border on focus */
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+    /* Gold glow */
+}
+
+.form-input::placeholder {
+    color: rgba(134, 134, 139, 0.5);
+    transition: color 0.3s;
+}
+
+.form-input:focus::placeholder {
+    color: rgba(134, 134, 139, 0.8);
+}
+
+textarea.form-input {
+    resize: vertical;
+    min-height: 120px;
+    /* Taller box for message */
+}
+
+/* Submit Button */
+.submit-btn {
+    margin-top: var(--spacing-sm);
+    padding: 15px 30px;
+    background: transparent;
+    border: 1px solid var(--color-text-secondary);
+    color: var(--color-text-secondary);
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: not-allowed;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+    align-self: center;
+}
+
+.submit-btn.active {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    /* Text becomes Gold */
+    background: rgba(212, 175, 55, 0.1);
+    /* Subtle Gold Tint */
+    cursor: none;
+    /* Keep custom cursor */
+    opacity: 1;
+}
+
+.submit-btn.active:hover {
+    background: var(--color-accent);
+    color: #000;
+    /* Black text on Gold bg */
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+}
+
+/* Success Message */
+.success-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    padding: var(--spacing-md);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+.success-message.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.success-icon {
+    font-size: 3rem;
+    color: var(--color-accent);
+    margin-bottom: var(--spacing-sm);
+    display: block;
+}
+
+.success-text {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    color: var(--color-text-primary);
+}

@@ -1,0 +1,843 @@
+/* Works Section */
+.work-section {
+    padding: var(--spacing-xl) var(--spacing-md);
+    position: relative;
+    z-index: 10;
+}
+
+/* Header Spacer */
+.work-section .section-header {
+    margin-bottom: 0;
+}
+
+/* Project List Layout */
+.project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    /* No gap, borders define separation */
+    margin-top: var(--spacing-lg);
+}
+
+/* Hover Dimming Effect Wrapper */
+.project-list:hover .project-item {
+    opacity: 0.3;
+    /* Dim all items when list is hovered */
+    filter: blur(2px);
+}
+
+.project-wrapper {
+    width: 100%;
+}
+
+.project-item {
+    display: block;
+    width: 100%;
+    padding: var(--spacing-lg) 0;
+    /* Larger padding for premium feel */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.5s var(--ease-out-expo);
+    cursor: none;
+    position: relative;
+    text-decoration: none;
+}
+
+/* Restore Opacity and Scale on Hover of Specific Item */
+.project-list .project-item:hover {
+    opacity: 1;
+    filter: blur(0);
+    z-index: 2;
+    transform: scale(1.02);
+    /* Slight pop */
+    border-color: var(--color-accent);
+    padding-left: var(--spacing-md);
+    /* Indent on hover */
+}
+
+/* Project Info Grid */
+.project-info {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    /* Year | Title | Category */
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+/* Typography & Elements */
+.project-year {
+    font-family: var(--font-sans);
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+}
+
+.project-title {
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 4vw, 4rem);
+    /* Responsive fluid font size */
+    font-weight: 400;
+    color: var(--color-text-primary);
+    margin: 0;
+    transition: color 0.3s;
+    white-space: nowrap;
+    /* Prevent wrapping if possible */
+}
+
+.project-item:hover .project-title {
+    color: var(--color-accent);
+}
+
+.project-category {
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    justify-self: end;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.project-item:hover .project-category {
+    opacity: 1;
+    color: var(--color-accent);
+}
+
+/* Dynamic Background Container */
+.project-preview-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    /* Slower transition for cinematic feel */
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.4) grayscale(20%);
+    /* Artistic touch */
+}
+
+/* Compact Track List Variant */
+.project-list.compact .project-item {
+    padding: var(--spacing-sm) 0;
+}
+
+.project-list.compact .project-info {
+    grid-template-columns: 60px 1fr auto 60px;
+    /* Year | Title | Category | Duration */
+}
+
+.project-list.compact .project-title {
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+}
+
+.project-list.compact .project-item:hover {
+    padding-left: var(--spacing-sm);
+}
+
+/* Duration Display */
+.project-duration {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    justify-self: end;
+    opacity: 0.6;
+    letter-spacing: 0.05em;
+    font-variant-numeric: tabular-nums;
+    transition: opacity 0.3s, color 0.3s;
+}
+
+.project-item:hover .project-duration {
+    opacity: 1;
+    color: var(--color-accent);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .project-info {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        gap: var(--spacing-xs);
+        text-align: left;
+    }
+
+    .project-year {
+        font-size: 0.8rem;
+        color: var(--color-accent);
+    }
+
+    .project-title {
+        font-size: 2.5rem;
+        white-space: normal;
+        /* Allow wrap on mobile */
+    }
+
+    .project-category {
+        justify-self: start;
+        margin-top: var(--spacing-xs);
+    }
+
+    .project-list:hover .project-item {
+        opacity: 1;
+        /* Disable dimming on touch devices */
+        filter: none;
+    }
+
+    .project-item:hover {
+        padding-left: 0;
+        /* Disable shift on touch */
+        transform: none;
+    }
+
+    /* Compact mobile adjustments */
+    .project-list.compact .project-info {
+        grid-template-columns: 1fr auto;
+        grid-template-rows: auto auto;
+    }
+
+    .project-list.compact .project-title {
+        font-size: 1.4rem;
+        grid-column: 1 / -1;
+    }
+
+    .project-list.compact .project-year {
+        grid-row: 2;
+    }
+
+    .project-list.compact .project-duration {
+        grid-row: 2;
+        justify-self: end;
+    }
+
+    .project-list.compact .project-category {
+        display: none;
+    }
+}
+
+/* =========================================
+   Works Toggle (Visual vs Audio)
+   ========================================= */
+
+.works-header-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    /* No border-bottom */
+}
+
+.works-header-container .section-header {
+    margin: 0;
+    border-bottom: none;
+}
+
+.works-header-container .section-label {
+    font-size: 1rem;
+    letter-spacing: 0.25em;
+}
+
+/* Centered Toggle Wrapper */
+.toggle-wrapper {
+    z-index: 10;
+}
+
+/* Liquid Glass Capsule */
+.work-toggle.liquid-glass {
+    display: flex;
+    gap: 0;
+    padding: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 999px;
+    /* Pill shape */
+
+    /* Optical Depth & Edge Highlighting */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+
+    box-shadow:
+        inset 0 0 20px rgba(255, 255, 255, 0.02),
+        /* Inner Glow */
+        inset 0 -1px 1px rgba(0, 0, 0, 0.3),
+        /* Inner Shadows */
+        0 10px 20px rgba(0, 0, 0, 0.2);
+    /* Drop Shadow */
+}
+
+.toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary);
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: none;
+    padding: 10px 24px;
+    border-radius: 999px;
+    transition: all 0.4s var(--ease-out-expo);
+    position: relative;
+    z-index: 2;
+}
+
+.toggle-btn::after {
+    display: none;
+    /* Remove old underline */
+}
+
+.toggle-btn:hover {
+    color: var(--color-text-primary);
+}
+
+/* Active State (Button Highlight inside Glass) */
+.toggle-btn.active {
+    color: var(--color-text-primary);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 2px 10px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .works-header-container {
+        padding-bottom: var(--spacing-sm);
+    }
+
+    .toggle-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+}
+
+/* Container Visibility */
+.works-container {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s;
+    will-change: opacity, transform;
+}
+
+.works-container.active {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    position: relative;
+    transform: translateY(0);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0s;
+}
+
+
+/* =========================================
+   Visual Works (Horizontal Gallery)
+   ========================================= */
+
+.gallery-scroll-container {
+    display: flex;
+    justify-content: center;
+    /* Center items */
+    overflow-x: auto;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-md) 0 var(--spacing-xl) 0;
+    /* Creating space for hover expansion */
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    /* Hide scrollbar */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE 10+ */
+}
+
+.gallery-scroll-container::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
+}
+
+.gallery-item {
+    flex: 0 0 300px;
+    /* Fixed width poster */
+    scroll-snap-align: center;
+    cursor: none;
+    transition: transform 0.4s var(--ease-out-expo);
+    position: relative;
+    /* For z-index stacking */
+}
+
+.gallery-poster {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    /* Cinematic Poster Ratio */
+    background-size: cover;
+    background-position: center;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.4s var(--ease-out-expo);
+}
+
+.gallery-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.play-icon {
+    font-size: 3rem;
+    color: #fff;
+    transform: scale(0.8);
+    transition: transform 0.4s var(--ease-out-expo);
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.gallery-info {
+    margin-top: var(--spacing-sm);
+    text-align: center;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.gallery-info h3 {
+    font-family: var(--font-serif);
+    font-size: 1.2rem;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.gallery-info span {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+
+/* Hover Effects */
+.gallery-item:hover {
+    transform: translateY(-10px) scale(1.02);
+    z-index: 10;
+}
+
+.gallery-item:hover .gallery-poster {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.gallery-item:hover .gallery-overlay {
+    opacity: 1;
+}
+
+.gallery-item:hover .play-icon {
+    transform: scale(1);
+}
+
+.gallery-item:hover .gallery-info {
+    opacity: 1;
+}
+
+
+/* =========================================
+   Video Lightbox Modal
+   ========================================= */
+
+.video-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    will-change: opacity;
+}
+
+.video-modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 1200px;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    transform: scale(0.9);
+    transition: transform 0.4s var(--ease-out-expo);
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+.video-modal-overlay.active .modal-content {
+    transform: scale(1) translate3d(0, 0, 0);
+}
+
+.modal-content video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 3rem;
+    cursor: none;
+    line-height: 1;
+    transition: transform 0.3s, color 0.3s;
+    z-index: 10000;
+}
+
+.modal-close-btn:hover {
+    color: #fff;
+    transform: rotate(90deg);
+}
+
+/* =========================================
+   Custom Video Controls
+   ========================================= */
+
+.modal-content {
+    position: relative;
+}
+
+.video-title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 24px;
+    background: linear-gradient(rgba(0, 0, 0, 0.7), transparent);
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.85);
+    letter-spacing: 0.05em;
+    text-align: center;
+    z-index: 10;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.video-title.hidden {
+    opacity: 0;
+}
+
+.video-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+    opacity: 1;
+    transition: opacity 0.4s ease;
+    z-index: 10;
+}
+
+.video-controls.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.video-play-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-text-primary);
+    font-size: 1.1rem;
+    cursor: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    transition: color 0.3s;
+    padding: 0;
+}
+
+.video-play-btn:hover {
+    color: var(--color-accent);
+}
+
+.video-play-btn .icon-play {
+    padding-left: 2px;
+}
+
+.video-time {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.05em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 80px;
+}
+
+.video-seek-container {
+    flex: 1;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    cursor: none;
+    position: relative;
+}
+
+.video-seek-container::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+}
+
+.video-seek-bar {
+    height: 3px;
+    background: var(--color-accent);
+    border-radius: 2px;
+    width: 0%;
+    position: relative;
+    z-index: 1;
+    transition: none;
+    pointer-events: none;
+}
+
+/* Seek thumb dot */
+.video-seek-bar::after {
+    content: '';
+    position: absolute;
+    right: -5px;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    background: var(--color-text-primary);
+    border-radius: 50%;
+    transform: translateY(-50%) scale(0);
+    transition: transform 0.2s ease;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+.video-seek-container:hover .video-seek-bar::after {
+    transform: translateY(-50%) scale(1);
+}
+
+.video-seek-container:hover .video-seek-bar {
+    height: 5px;
+}
+
+.video-seek-container:hover::before {
+    height: 5px;
+}
+
+/* Video Volume Control */
+.video-volume-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.video-volume-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    transition: color 0.3s;
+}
+
+.video-volume-btn:hover {
+    color: var(--color-accent);
+}
+
+.video-volume-btn .volume-icon {
+    pointer-events: none;
+    display: block;
+}
+
+.video-volume-slider-wrapper {
+    width: 60px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.video-volume-slider-wrapper,
+.video-volume-slider-wrapper * {
+    cursor: pointer !important;
+}
+
+.video-volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+    outline: none;
+}
+
+.video-volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    background: var(--color-text-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+.video-volume-slider::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    background: var(--color-text-primary);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+.video-fullscreen-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    flex-shrink: 0;
+    transition: color 0.3s;
+}
+
+.video-fullscreen-btn:hover {
+    color: var(--color-accent);
+}
+
+/* Cursor visibility in video modal */
+.video-modal-overlay,
+.video-modal-overlay * {
+    cursor: none;
+}
+
+
+/* Mobile for Gallery & Video Controls */
+@media (max-width: 768px) {
+    .gallery-scroll-container {
+        justify-content: flex-start;
+        padding-left: var(--spacing-md);
+        padding-right: var(--spacing-md);
+        /* Show a subtle scrollbar on mobile */
+        scrollbar-width: thin;
+        scrollbar-color: rgba(212, 175, 55, 0.3) transparent;
+    }
+
+    .gallery-scroll-container::-webkit-scrollbar {
+        display: block;
+        height: 4px;
+    }
+
+    .gallery-scroll-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .gallery-scroll-container::-webkit-scrollbar-thumb {
+        background: rgba(212, 175, 55, 0.3);
+        border-radius: 2px;
+    }
+
+    .gallery-item {
+        flex: 0 0 240px;
+    }
+
+    /* Video Modal - full screen on mobile */
+    .modal-content {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 0;
+    }
+
+    /* Video Controls - two-row layout for mobile */
+    .video-controls {
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 8px 12px;
+    }
+
+    /* Seek bar on its own row, full width */
+    .video-seek-container {
+        order: -1;
+        flex: 1 1 100%;
+        height: 24px;
+    }
+
+    /* Time display smaller */
+    .video-time {
+        font-size: 0.65rem;
+        min-width: 65px;
+    }
+
+    /* Volume slider narrower on mobile, pushed to right */
+    .video-volume-slider-wrapper {
+        width: 45px;
+    }
+
+    .video-volume-container {
+        margin-left: auto;
+    }
+
+    /* Video title smaller */
+    .video-title {
+        font-size: 1rem;
+        padding: 10px 15px;
+    }
+}
