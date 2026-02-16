@@ -205,8 +205,8 @@ h4 {
     height: 50px;
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 5px;
-    /* Adjusted padding for smaller 50px circle */
+    padding: 0;
+    /* Zero padding for maximum logo fit inside 50px circle */
     transition: all 0.3s ease;
     background: transparent;
 }
