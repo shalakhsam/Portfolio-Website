@@ -1368,27 +1368,57 @@ if (toolsStrip) {
     toolsObserver.observe(toolsStrip);
 }
 
-// Mobile: auto-scroll hint for gallery (peek right then return)
+// Mobile: auto-scroll for gallery (Carousel effect)
 if (window.innerWidth <= 768) {
     const galleryContainer = document.querySelector('#visual-works .gallery-scroll-container');
     if (galleryContainer) {
-        let hintFired = false;
-        const galleryHintObserver = new IntersectionObserver((entries) => {
+        let scrollInterval;
+        let userInteracted = false;
+
+        const startAutoScroll = () => {
+            if (userInteracted || scrollInterval) return;
+
+            scrollInterval = setInterval(() => {
+                // If user touched it, stop everything (safety check)
+                if (userInteracted) {
+                    clearInterval(scrollInterval);
+                    return;
+                }
+
+                const maxScroll = galleryContainer.scrollWidth - galleryContainer.clientWidth;
+                // If at end, loop back. Else, scroll forward one item width (approx 300px with gap)
+                // Using 260px (240px item + 20px gap) approx
+                if (galleryContainer.scrollLeft >= maxScroll - 10) {
+                    galleryContainer.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    galleryContainer.scrollBy({ left: 260, behavior: 'smooth' });
+                }
+            }, 2000); // 2 second timing
+        };
+
+        const stopAutoScroll = () => {
+            userInteracted = true;
+            clearInterval(scrollInterval);
+        };
+
+        // Stop on any user touch/scroll interaction
+        galleryContainer.addEventListener('touchstart', stopAutoScroll, { passive: true });
+        galleryContainer.addEventListener('mousedown', stopAutoScroll);
+
+        // Also stop if they scroll manually (optional, but touchstart covers most mobile intent)
+        // We use IntersectionObserver to only auto-scroll when visible
+        const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting && !hintFired) {
-                    hintFired = true;
-                    // Brief peek scroll to hint at more content
-                    setTimeout(() => {
-                        galleryContainer.scrollTo({ left: 150, behavior: 'smooth' });
-                        setTimeout(() => {
-                            galleryContainer.scrollTo({ left: 0, behavior: 'smooth' });
-                        }, 600);
-                    }, 400);
+                if (entry.isIntersecting && !userInteracted) {
+                    startAutoScroll();
+                } else {
+                    clearInterval(scrollInterval);
+                    scrollInterval = null;
                 }
             });
-        }, { threshold: 0.2 });
+        }, { threshold: 0.5 });
 
-        galleryHintObserver.observe(galleryContainer);
+        observer.observe(galleryContainer);
     }
 }
 
