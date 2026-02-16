@@ -198,41 +198,19 @@ h4 {
 }
 
 .logo {
-    font-family: var(--font-serif);
-    font-size: 1.2rem;
-    font-weight: 600;
-    text-decoration: none;
-    color: var(--color-text-primary);
+    display: block;
+    width: 60px;
+    height: auto;
+    transition: transform 0.3s ease;
+}
 
-    /* Circular Design */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 50px;
-    /* Reduced from 60px */
-    height: 50px;
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-
-    /* Center text perfectly */
-    line-height: 1;
-    padding-top: 2px;
-    /* Visual adjustment for serif font baseline */
-
-    /* Musical Dust Texture Background */
-    background-image: url('../assets/musical_dust.png');
-    background-size: cover;
-    background-position: center;
-    background-color: rgba(255, 255, 255, 0.02);
-    /* Slight tint */
-
-    transition: all 0.3s ease;
+.logo img {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 .logo:hover {
-    color: var(--color-accent);
-    border-color: var(--color-accent);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
     transform: scale(1.05);
     /* Subtle grow */
 }

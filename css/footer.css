@@ -26,18 +26,20 @@
 }
 
 .footer-logo {
-    font-family: var(--font-serif);
-    font-size: 2rem;
-    font-weight: 600;
-    color: var(--color-text-primary);
-    text-transform: uppercase;
-    text-decoration: none;
-    letter-spacing: -0.02em;
-    transition: color 0.3s ease;
+    display: block;
+    width: 80px;
+    height: auto;
+    transition: transform 0.3s ease;
+}
+
+.footer-logo img {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 .footer-logo:hover {
-    color: var(--color-accent);
+    transform: scale(1.05);
 }
 
 .footer-nav {
