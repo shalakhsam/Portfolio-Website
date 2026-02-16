@@ -77,6 +77,10 @@ projects.forEach(project => {
 
 /* Audio Player Logic */
 const audio = new Audio();
+audio.addEventListener('error', (e) => {
+    alert("Audio File Error: " + (audio.error ? audio.error.message : "Unknown"));
+    console.error("Audio error:", audio.error);
+});
 const playerBar = document.querySelector('.audio-player-bar');
 const playPauseBtn = document.querySelector('.play-pause-btn');
 const playIcon = playPauseBtn.querySelector('span');
@@ -105,7 +109,10 @@ function playTrackByIndex(index) {
     const title = project.querySelector('.project-title').innerText;
 
     audio.src = src;
-    audio.play().catch(e => console.log("Audio play failed (interaction needed):", e));
+    audio.play().catch(e => {
+        console.log("Audio play failed:", e);
+        alert("Debug Error: " + e.message);
+    });
     isPlaying = true;
 
     updatePlayerUI(true, title);
