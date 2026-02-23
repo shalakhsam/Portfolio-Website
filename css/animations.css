@@ -4,7 +4,11 @@
     transform: translateY(20px);
     filter: blur(8px);
     letter-spacing: -0.1em;
-    /* Start tighter */
+    /* Start tighter, expands to final position */
+    display: inline-block;
+    contain: layout style;
+    /* Isolate layout reflow without clipping or size containment */
+    will-change: opacity, transform, filter, letter-spacing;
     animation: textReveal 1.4s var(--ease-out-expo) forwards;
 }
 
@@ -25,34 +29,38 @@
     opacity: 0;
     letter-spacing: 0em;
     /* Start tighter */
+    contain: layout style;
+    /* Isolate layout reflow without clipping or size containment */
+    will-change: opacity, transform, filter, letter-spacing;
     animation: fadeIn 1.5s var(--ease-out-expo) forwards;
     animation-delay: 1.2s;
 }
 
 @keyframes textReveal {
+    80% {
+        letter-spacing: -0.02em;
+        /* Letter-spacing settles before end to avoid stutter */
+    }
+
     to {
         opacity: 1;
         transform: translateY(0);
-        filter: blur(0);
+        filter: blur(0px);
         letter-spacing: -0.02em;
-        /* Expand to normal */
     }
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-        filter: blur(2px);
-        letter-spacing: 0em;
+    80% {
+        letter-spacing: 0.2em;
+        /* Letter-spacing settles before end to avoid stutter */
     }
 
     to {
         opacity: 1;
         transform: translateY(0);
-        filter: blur(0);
+        filter: blur(0px);
         letter-spacing: 0.2em;
-        /* Expand to wide */
     }
 }
 

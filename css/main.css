@@ -168,6 +168,8 @@ h4 {
     letter-spacing: 0.15em;
     /* Adjusted for serif */
     text-align: center;
+    min-height: 1.5em;
+    /* Reserve space so the name doesn't shift when subtitle animates in */
 }
 
 /* Navigation */
