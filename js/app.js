@@ -359,18 +359,27 @@ window.addEventListener('resize', () => {
 let videoModalActive = false;
 
 // Pattern for both mouse and touch
+let pendingTrailX = 0, pendingTrailY = 0, trailQueued = false;
 function spawnTrail(x, y) {
     if (videoModalActive) return; // No particles during video playback
-    // Spawn subtle trail
-    for (let i = 0; i < 2; i++) {
-        trailStars.push(new TrailParticle(x, y));
+    // Throttle to one spawn per animation frame to reduce GC pressure
+    pendingTrailX = x;
+    pendingTrailY = y;
+    if (!trailQueued) {
+        trailQueued = true;
+        requestAnimationFrame(() => {
+            trailQueued = false;
+            for (let i = 0; i < 2; i++) {
+                trailStars.push(new TrailParticle(pendingTrailX, pendingTrailY));
+            }
+        });
     }
 }
 
 // Track mouse for trail
 window.addEventListener('mousemove', (e) => {
     spawnTrail(e.clientX, e.clientY);
-});
+}, { passive: true });
 
 // Track touch for trail (Mobile Support)
 window.addEventListener('touchmove', (e) => {
@@ -382,32 +391,7 @@ window.addEventListener('touchmove', (e) => {
     }
 }, { passive: true });
 
-window.addEventListener('scroll', () => {
-    // Stop all nav hiding/glass effects if Mobile Menu is OPEN
-    if (document.body.style.overflow === 'hidden') return;
-
-    const scrollY = window.scrollY;
-
-    // 1. Glass Effect on Scroll
-    if (scrollY > 50) {
-        nav.classList.add('scrolled');
-    } else {
-        nav.classList.remove('scrolled');
-    }
-
-    // 2. Hide near Footer (Only if footer is visible/exists)
-    if (footer && getComputedStyle(footer).display !== 'none') {
-        const footerRect = footer.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-
-        // If footer is entering the viewport (visible at bottom)
-        if (footerRect.top < windowHeight) {
-            nav.classList.add('hidden');
-        } else {
-            nav.classList.remove('hidden');
-        }
-    }
-});
+// Scroll handler is defined once below (after nav/footer are declared) to avoid duplication
 
 // Hide/Show Cursor when leaving window
 document.addEventListener('mouseout', (e) => {
@@ -462,6 +446,9 @@ class Star {
 
         this.opacity = Math.random() * 0.5 + 0.1;
         this.fadeDir = Math.random() > 0.5 ? 0.005 : -0.005;
+
+        // Pre-compute gold vs white color (avoids per-frame Math.random)
+        this.isGold = !this.isNote && Math.random() > 0.9;
     }
 
     update() {
@@ -488,7 +475,7 @@ class Star {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
 
-            if (Math.random() > 0.9) {
+            if (this.isGold) {
                 ctx.fillStyle = `rgba(212, 175, 55, ${this.opacity})`;
             } else {
                 ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
@@ -562,13 +549,14 @@ function animateStars() {
         star.draw();
     });
 
-    // Trail Particles
+    // Trail Particles — swap-and-pop removal (O(1) vs O(n) splice)
     for (let i = trailStars.length - 1; i >= 0; i--) {
         const p = trailStars[i];
         p.update();
         p.draw();
         if (p.life <= 0) {
-            trailStars.splice(i, 1);
+            trailStars[i] = trailStars[trailStars.length - 1];
+            trailStars.pop();
         }
     }
 
@@ -632,12 +620,19 @@ class ScrollItem {
         this.target.scale = 1 - (progress * 0.05);
     }
 
-    // Lerp phase (Calc)
+    // Lerp phase (Calc) — returns true if still animating
     updateCurrent() {
         const factor = 0.15;
         this.current.opacity = lerp(this.current.opacity, this.target.opacity, factor);
         this.current.translateY = lerp(this.current.translateY, this.target.translateY, factor);
         this.current.scale = lerp(this.current.scale, this.target.scale, factor);
+
+        // Check if values have converged (settled)
+        const settled =
+            Math.abs(this.current.opacity - this.target.opacity) < 0.005 &&
+            Math.abs(this.current.translateY - this.target.translateY) < 0.1 &&
+            Math.abs(this.current.scale - this.target.scale) < 0.0005;
+        return !settled;
     }
 
     // Render phase (Write)
@@ -645,8 +640,6 @@ class ScrollItem {
         // Use translate3d for GPU acceleration
         this.el.style.transform = `translate3d(0, ${this.current.translateY.toFixed(2)}px, 0) scale(${this.current.scale.toFixed(4)})`;
         this.el.style.opacity = this.current.opacity.toFixed(3);
-        // Filter blur removed to eliminate jitter
-        this.el.style.filter = 'none';
     }
 }
 
@@ -674,9 +667,14 @@ function initScrollItems() {
 
 initScrollItems();
 
+// Scroll animation loop with idle detection — stops when all items have settled
+let scrollAnimRunning = false;
+
 function animateScroll() {
     const windowHeight = window.innerHeight;
     const centerLine = windowHeight / 2;
+
+    let anyAnimating = false;
 
     // 1. READ Phase (Batch all reads)
     for (const item of scrollItemsMap.values()) {
@@ -685,15 +683,28 @@ function animateScroll() {
 
     // 2. CALC & WRITE Phase
     for (const item of scrollItemsMap.values()) {
-        item.updateCurrent(); // Pure math
+        const still = item.updateCurrent(); // Pure math — returns true if still animating
         item.render();        // DOM Write
+        if (still) anyAnimating = true;
     }
 
-    requestAnimationFrame(animateScroll);
+    // Only continue loop if something is still moving
+    if (anyAnimating) {
+        requestAnimationFrame(animateScroll);
+    } else {
+        scrollAnimRunning = false;
+    }
 }
 
-// Start loop
-animateScroll();
+function kickScrollAnim() {
+    if (!scrollAnimRunning) {
+        scrollAnimRunning = true;
+        requestAnimationFrame(animateScroll);
+    }
+}
+
+// Start initial loop
+kickScrollAnim();
 
 /* =========================================
    Contact Form Logic
@@ -853,29 +864,44 @@ mobileLinks.forEach(link => {
     });
 });
 
+// Single, merged, RAF-throttled scroll handler (passive for butter-smooth scrolling)
+let scrollTicking = false;
 window.addEventListener('scroll', () => {
-    const scrollY = window.scrollY;
+    // Kick the scroll animation loop on any scroll
+    kickScrollAnim();
 
-    // 1. Glass Effect on Scroll
-    if (scrollY > 50) {
-        nav.classList.add('scrolled');
-    } else {
-        nav.classList.remove('scrolled');
+    // RAF-throttle nav logic to max once per frame
+    if (!scrollTicking) {
+        scrollTicking = true;
+        requestAnimationFrame(() => {
+            scrollTicking = false;
+
+            // Stop all nav hiding/glass effects if Mobile Menu is OPEN
+            if (document.body.style.overflow === 'hidden') return;
+
+            const scrollY = window.scrollY;
+
+            // 1. Glass Effect on Scroll
+            if (scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+
+            // 2. Hide near Footer (Only if footer is visible/exists)
+            if (footer && getComputedStyle(footer).display !== 'none') {
+                const footerRect = footer.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+
+                if (footerRect.top < windowHeight) {
+                    nav.classList.add('hidden');
+                } else {
+                    nav.classList.remove('hidden');
+                }
+            }
+        });
     }
-
-    // 2. Hide near Footer (Only if footer is visible/exists)
-    if (footer && getComputedStyle(footer).display !== 'none') {
-        const footerRect = footer.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-
-        // If footer is entering the viewport (visible at bottom)
-        if (footerRect.top < windowHeight) {
-            nav.classList.add('hidden');
-        } else {
-            nav.classList.remove('hidden');
-        }
-    }
-});
+}, { passive: true });
 
 /* =========================================
    Scroll Animations w/ Intersection Observer

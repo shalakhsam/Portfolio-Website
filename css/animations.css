@@ -62,7 +62,7 @@
        Transitions removed so JS can "scrub" these values frame-by-frame.
        We only transition unrelated properties if needed.
     */
-    will-change: opacity, transform, filter;
+    will-change: opacity, transform;
     opacity: 0;
     /* Start hidden */
 }
@@ -71,7 +71,6 @@
 .scroll-hidden-bottom {
     opacity: 0;
     transform: translateY(100px) scale(0.95);
-    filter: blur(10px);
 }
 
 /* State: Visible (In viewport) */
@@ -85,5 +84,4 @@
 .scroll-out-top {
     opacity: 0;
     transform: translateY(-100px) scale(0.9);
-    filter: blur(20px);
 }
