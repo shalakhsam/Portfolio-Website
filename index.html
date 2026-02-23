@@ -7,7 +7,7 @@
     <title>Shalakh Sam Varughese | Composer for Visual Media</title>
     <meta name="description" content="Portfolio of Shalakh Sam Varughese, Composer for Visual Media.">
 
-    <!-- Typography: Playfair Display (Serif/Titles), Inter (Sans/Body) -->
+    <!-- Typography: Cormorant Garamond (Serif/Titles), Inter (Sans/Body) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -37,13 +37,15 @@
     <meta property="twitter:description" content="Portfolio of Shalakh Sam Varughese, Composer for Visual Media.">
     <meta property="twitter:image" content="https://shalakhsamvarughese.com/assets/Opengraph.png">
 
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="text/javascript">
-        (function () {
-            // Initialize EmailJS with Public Key
-            emailjs.init("ku49fcOBKT22ofxVw");
-        })();
+    <!-- EmailJS SDK (defer = non-render-blocking, loads after HTML parsed) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+        // Initialize EmailJS after the deferred SDK loads
+        window.addEventListener('load', function () {
+            if (typeof emailjs !== 'undefined') {
+                emailjs.init("ku49fcOBKT22ofxVw");
+            }
+        });
     </script>
 </head>
 
