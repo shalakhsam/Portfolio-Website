@@ -1419,8 +1419,6 @@ if (window.innerWidth <= 768) {
         const stopAutoScroll = () => {
             userInteracted = true;
             cancelAnimationFrame(animationId);
-            // Re-enable scroll-snap for manual swiping
-            galleryContainer.style.scrollSnapType = 'x mandatory';
         };
 
         // Stop on any user touch/scroll interaction
@@ -1439,7 +1437,7 @@ if (window.innerWidth <= 768) {
                     animationId = null;
                 }
             });
-        }, { threshold: 0.5 });
+        }, { threshold: 0.1 });
 
         observer.observe(galleryContainer);
     }
