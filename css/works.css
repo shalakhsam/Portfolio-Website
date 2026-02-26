@@ -355,18 +355,25 @@
     gap: var(--spacing-lg);
     padding: var(--spacing-md) 0 var(--spacing-xl) 0;
     /* Creating space for hover expansion */
-    scroll-snap-type: x mandatory;
+    scroll-snap-type: none;
     -webkit-overflow-scrolling: touch;
-    /* Hide scrollbar */
-    scrollbar-width: none;
-    /* Firefox */
-    -ms-overflow-style: none;
-    /* IE 10+ */
+    /* Styled scrollbar (all screens) */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(212, 175, 55, 0.3) transparent;
 }
 
 .gallery-scroll-container::-webkit-scrollbar {
-    display: none;
-    /* Chrome/Safari */
+    display: block;
+    height: 4px;
+}
+
+.gallery-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.gallery-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(212, 175, 55, 0.3);
+    border-radius: 2px;
 }
 
 .gallery-item {
@@ -807,25 +814,6 @@
         justify-content: flex-start;
         padding-left: var(--spacing-md);
         padding-right: var(--spacing-md);
-        /* Disable scroll-snap on mobile so auto-scroll works (snap fights 0.5px increments) */
-        scroll-snap-type: none;
-        /* Show a subtle scrollbar on mobile */
-        scrollbar-width: thin;
-        scrollbar-color: rgba(212, 175, 55, 0.3) transparent;
-    }
-
-    .gallery-scroll-container::-webkit-scrollbar {
-        display: block;
-        height: 4px;
-    }
-
-    .gallery-scroll-container::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .gallery-scroll-container::-webkit-scrollbar-thumb {
-        background: rgba(212, 175, 55, 0.3);
-        border-radius: 2px;
     }
 
     .gallery-item {

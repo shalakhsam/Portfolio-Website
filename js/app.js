@@ -1394,8 +1394,8 @@ if (toolsStrip) {
     toolsObserver.observe(toolsStrip);
 }
 
-// Mobile: Continuous smooth auto-scroll for gallery
-if (window.innerWidth <= 768) {
+// Continuous smooth auto-scroll for gallery (all screen sizes)
+{
     const galleryContainer = document.querySelector('#visual-works .gallery-scroll-container');
     if (galleryContainer) {
         let userInteracted = false;
