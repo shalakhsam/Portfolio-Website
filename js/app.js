@@ -949,7 +949,6 @@ document.querySelectorAll('.scroll-animate').forEach(el => {
    ========================================= */
 const toggleBtns = document.querySelectorAll('.toggle-btn');
 const worksContainers = document.querySelectorAll('.works-container');
-const videos = document.querySelectorAll('video');
 
 toggleBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -967,8 +966,9 @@ toggleBtns.forEach(btn => {
             }
         });
 
-        // 3. Pause Videos on Switch (audio keeps playing)
-        videos.forEach(video => video.pause());
+        // 3. Pause modal audio on switch
+        const modalAudio = document.getElementById('modal-audio-player');
+        if (modalAudio && !modalAudio.paused) modalAudio.pause();
 
         // 4. Force-reveal scroll items in the new container to prevent re-animation jitter
         const newContainer = document.getElementById(`${type}-works`);
@@ -982,7 +982,7 @@ toggleBtns.forEach(btn => {
 });
 
 /* =========================================
-   Video Gallery & Lightbox Logic
+   Gallery Lightbox Modal (Audio + Poster)
    ========================================= */
 
 // Gallery Horizontal Scroll (Optional: Add drag-to-scroll if needed, currently native scroll)
@@ -1019,9 +1019,10 @@ if (galleryContainer) {
 }
 
 
-// Lightbox Modal Logic with Custom Video Controls
+// Lightbox Modal Logic with Audio + Poster
 const videoModal = document.getElementById('video-modal');
-const modalVideoPlayer = document.getElementById('modal-video-player');
+const modalAudioPlayer = document.getElementById('modal-audio-player');
+const modalPoster = document.getElementById('modal-poster');
 const modalCloseBtn = document.querySelector('.modal-close-btn');
 const galleryItems = document.querySelectorAll('.gallery-item');
 
@@ -1030,11 +1031,10 @@ const videoPlayBtn = document.querySelector('.video-play-btn');
 const videoTimeDisplay = document.querySelector('.video-time');
 const videoSeekContainer = document.querySelector('.video-seek-container');
 const videoSeekBar = document.querySelector('.video-seek-bar');
-const videoFullscreenBtn = document.querySelector('.video-fullscreen-btn');
 const videoControlsBar = document.querySelector('.video-controls');
 const videoTitleEl = document.querySelector('.video-title');
 
-if (videoModal && modalVideoPlayer) {
+if (videoModal && modalAudioPlayer) {
     let isDraggingVideoSeek = false;
     let controlsTimeout = null;
 
@@ -1051,8 +1051,8 @@ if (videoModal && modalVideoPlayer) {
         if (videoControlsBar) videoControlsBar.classList.remove('hidden');
         if (videoTitleEl) videoTitleEl.classList.remove('hidden');
         clearTimeout(controlsTimeout);
-        // Auto-hide after 3 seconds if video is playing
-        if (!modalVideoPlayer.paused) {
+        // Auto-hide after 3 seconds if audio is playing
+        if (!modalAudioPlayer.paused) {
             controlsTimeout = setTimeout(() => {
                 if (videoControlsBar) videoControlsBar.classList.add('hidden');
                 if (videoTitleEl) videoTitleEl.classList.add('hidden');
@@ -1070,9 +1070,10 @@ if (videoModal && modalVideoPlayer) {
                 updatePlayerUI(false);
             }
 
-            const videoSrc = item.getAttribute('data-video-src');
-            if (videoSrc) {
-                // Set video title from gallery info
+            const audioSrc = item.getAttribute('data-audio-src');
+            const posterSrc = item.getAttribute('data-poster');
+            if (audioSrc) {
+                // Set title from gallery info
                 const infoEl = item.querySelector('.gallery-info');
                 if (infoEl && videoTitleEl) {
                     const h3 = infoEl.querySelector('h3');
@@ -1082,7 +1083,12 @@ if (videoModal && modalVideoPlayer) {
                     videoTitleEl.textContent = type ? `${title} — ${type}` : title;
                 }
 
-                modalVideoPlayer.src = videoSrc;
+                // Set poster image
+                if (modalPoster && posterSrc) {
+                    modalPoster.src = posterSrc;
+                }
+
+                modalAudioPlayer.src = audioSrc;
 
                 // Reset Seeker & Time immediately
                 if (videoSeekBar) videoSeekBar.style.width = '0%';
@@ -1092,16 +1098,12 @@ if (videoModal && modalVideoPlayer) {
                 videoModalActive = true; // Disable particle trail
                 delay = DELAY_SNAP; // Cursor follows instantly in modal
 
-                // Hide canvases to free GPU for video decoding
-                canvas.style.display = 'none';
-                trailCanvas.style.display = 'none';
-
                 // Ensure custom cursor is visible
                 cursorDot.style.opacity = '1';
                 cursorOutline.style.opacity = '1';
 
                 setTimeout(() => {
-                    modalVideoPlayer.play().catch(e => console.log("Auto-play failed:", e));
+                    modalAudioPlayer.play().catch(e => console.log("Auto-play failed:", e));
                 }, 100);
 
                 document.body.style.overflow = 'hidden';
@@ -1112,15 +1114,12 @@ if (videoModal && modalVideoPlayer) {
 
     // Close Modal Function
     function closeModal() {
-        modalVideoPlayer.pause();
-        modalVideoPlayer.src = "";
+        modalAudioPlayer.pause();
+        modalAudioPlayer.src = "";
+        if (modalPoster) modalPoster.src = "";
         videoModal.classList.remove('active');
         videoModalActive = false; // Re-enable particle trail
         delay = DELAY_NORMAL; // Restore cursor trail
-
-        // Restore canvases
-        canvas.style.display = '';
-        trailCanvas.style.display = '';
 
         document.body.style.overflow = '';
         clearTimeout(controlsTimeout);
@@ -1134,19 +1133,21 @@ if (videoModal && modalVideoPlayer) {
 
     // Play/Pause Toggle
     function toggleVideoPlay() {
-        if (modalVideoPlayer.paused) {
-            modalVideoPlayer.play();
+        if (modalAudioPlayer.paused) {
+            modalAudioPlayer.play();
         } else {
-            modalVideoPlayer.pause();
+            modalAudioPlayer.pause();
         }
     }
 
-    // Click video to play/pause
-    modalVideoPlayer.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleVideoPlay();
-        showControls();
-    });
+    // Click poster to play/pause
+    if (modalPoster) {
+        modalPoster.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleVideoPlay();
+            showControls();
+        });
+    }
 
     // Play button
     if (videoPlayBtn) {
@@ -1157,14 +1158,14 @@ if (videoModal && modalVideoPlayer) {
     }
 
     // Update play/pause icon
-    modalVideoPlayer.addEventListener('play', () => {
+    modalAudioPlayer.addEventListener('play', () => {
         if (videoPlayBtn) {
             videoPlayBtn.innerHTML = '<span>&#10074;&#10074;</span>'; // Pause icon
         }
         showControls(); // Start auto-hide timer
     });
 
-    modalVideoPlayer.addEventListener('pause', () => {
+    modalAudioPlayer.addEventListener('pause', () => {
         if (videoPlayBtn) {
             videoPlayBtn.innerHTML = '<span class="icon-play">&#9654;</span>'; // Play icon
         }
@@ -1173,13 +1174,13 @@ if (videoModal && modalVideoPlayer) {
     });
 
     // Time update → seek bar + time display
-    modalVideoPlayer.addEventListener('timeupdate', () => {
-        if (!isDraggingVideoSeek && modalVideoPlayer.duration) {
-            const percent = (modalVideoPlayer.currentTime / modalVideoPlayer.duration) * 100;
+    modalAudioPlayer.addEventListener('timeupdate', () => {
+        if (!isDraggingVideoSeek && modalAudioPlayer.duration) {
+            const percent = (modalAudioPlayer.currentTime / modalAudioPlayer.duration) * 100;
             videoSeekBar.style.width = `${percent}%`;
         }
         if (videoTimeDisplay) {
-            videoTimeDisplay.textContent = `${formatTime(modalVideoPlayer.currentTime)} / ${formatTime(modalVideoPlayer.duration)}`;
+            videoTimeDisplay.textContent = `${formatTime(modalAudioPlayer.currentTime)} / ${formatTime(modalAudioPlayer.duration)}`;
         }
     });
 
@@ -1193,7 +1194,7 @@ if (videoModal && modalVideoPlayer) {
         }
 
         videoSeekContainer.addEventListener('mousedown', (e) => {
-            if (!modalVideoPlayer.duration) return;
+            if (!modalAudioPlayer.duration) return;
             isDraggingVideoSeek = true;
             const percent = getVideoSeekPercent(e);
             videoSeekBar.style.width = `${percent * 100}%`;
@@ -1201,7 +1202,7 @@ if (videoModal && modalVideoPlayer) {
         });
 
         window.addEventListener('mousemove', (e) => {
-            if (isDraggingVideoSeek && modalVideoPlayer.duration) {
+            if (isDraggingVideoSeek && modalAudioPlayer.duration) {
                 const percent = getVideoSeekPercent(e);
                 videoSeekBar.style.width = `${percent * 100}%`;
             }
@@ -1210,16 +1211,16 @@ if (videoModal && modalVideoPlayer) {
         window.addEventListener('mouseup', (e) => {
             if (isDraggingVideoSeek) {
                 isDraggingVideoSeek = false;
-                if (modalVideoPlayer.duration) {
+                if (modalAudioPlayer.duration) {
                     const percent = getVideoSeekPercent(e);
-                    modalVideoPlayer.currentTime = percent * modalVideoPlayer.duration;
+                    modalAudioPlayer.currentTime = percent * modalAudioPlayer.duration;
                 }
             }
         });
 
         // Touch support for mobile
         videoSeekContainer.addEventListener('touchstart', (e) => {
-            if (!modalVideoPlayer.duration) return;
+            if (!modalAudioPlayer.duration) return;
             isDraggingVideoSeek = true;
             const percent = getVideoSeekPercent(e);
             videoSeekBar.style.width = `${percent * 100}%`;
@@ -1228,7 +1229,7 @@ if (videoModal && modalVideoPlayer) {
         }, { passive: false });
 
         videoSeekContainer.addEventListener('touchmove', (e) => {
-            if (isDraggingVideoSeek && modalVideoPlayer.duration) {
+            if (isDraggingVideoSeek && modalAudioPlayer.duration) {
                 const percent = getVideoSeekPercent(e);
                 videoSeekBar.style.width = `${percent * 100}%`;
                 e.preventDefault();
@@ -1238,18 +1239,18 @@ if (videoModal && modalVideoPlayer) {
         videoSeekContainer.addEventListener('touchend', (e) => {
             if (isDraggingVideoSeek) {
                 isDraggingVideoSeek = false;
-                if (modalVideoPlayer.duration) {
+                if (modalAudioPlayer.duration) {
                     // Use last touch position
                     const rect = videoSeekContainer.getBoundingClientRect();
                     const barWidth = videoSeekBar.getBoundingClientRect().width;
                     const percent = barWidth / rect.width;
-                    modalVideoPlayer.currentTime = percent * modalVideoPlayer.duration;
+                    modalAudioPlayer.currentTime = percent * modalAudioPlayer.duration;
                 }
             }
         });
     }
 
-    // Video Volume Control
+    // Volume Control
     const videoVolumeBtn = document.querySelector('.video-volume-btn');
     const videoVolumeSlider = document.querySelector('.video-volume-slider');
     const videoVolumeSliderWrapper = document.querySelector('.video-volume-slider-wrapper');
@@ -1280,27 +1281,27 @@ if (videoModal && modalVideoPlayer) {
 
         videoVolumeSlider.addEventListener('input', (e) => {
             const val = parseFloat(e.target.value);
-            modalVideoPlayer.volume = val;
+            modalAudioPlayer.volume = val;
             updateVideoVolumeSliderVisual(val);
             updateVideoVolumeIcon(val);
         });
 
         videoVolumeBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (modalVideoPlayer.volume > 0) {
-                lastVideoVolume = modalVideoPlayer.volume;
-                modalVideoPlayer.volume = 0;
+            if (modalAudioPlayer.volume > 0) {
+                lastVideoVolume = modalAudioPlayer.volume;
+                modalAudioPlayer.volume = 0;
                 videoVolumeSlider.value = 0;
             } else {
-                modalVideoPlayer.volume = lastVideoVolume;
+                modalAudioPlayer.volume = lastVideoVolume;
                 videoVolumeSlider.value = lastVideoVolume;
             }
-            updateVideoVolumeSliderVisual(modalVideoPlayer.volume);
-            updateVideoVolumeIcon(modalVideoPlayer.volume);
+            updateVideoVolumeSliderVisual(modalAudioPlayer.volume);
+            updateVideoVolumeIcon(modalAudioPlayer.volume);
         });
     }
 
-    // Hide custom cursor on video volume slider
+    // Hide custom cursor on volume slider
     if (videoVolumeSliderWrapper) {
         videoVolumeSliderWrapper.addEventListener('mouseenter', () => {
             cursorDot.style.opacity = '0';
@@ -1311,34 +1312,6 @@ if (videoModal && modalVideoPlayer) {
             cursorOutline.style.opacity = '1';
         });
     }
-
-    // Fullscreen toggle
-    if (videoFullscreenBtn) {
-        videoFullscreenBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const modalContent = document.querySelector('.modal-content');
-            if (document.fullscreenElement) {
-                document.exitFullscreen();
-            } else if (modalContent) {
-                modalContent.requestFullscreen().catch(err => console.log("Fullscreen failed:", err));
-            }
-        });
-    }
-
-    // Show native cursor in fullscreen (custom cursor divs are outside the fullscreen element)
-    document.addEventListener('fullscreenchange', () => {
-        const fs = document.fullscreenElement;
-        if (fs && fs.classList.contains('modal-content')) {
-            fs.style.cursor = 'default';
-            fs.querySelectorAll('*').forEach(el => el.style.cursor = 'default');
-            cursorDot.style.opacity = '0';
-            cursorOutline.style.opacity = '0';
-        } else {
-            // Exiting fullscreen — restore custom cursor
-            cursorDot.style.opacity = '1';
-            cursorOutline.style.opacity = '1';
-        }
-    });
 
     // Show controls on mouse movement inside modal
     videoModal.addEventListener('mousemove', () => {
@@ -1368,8 +1341,8 @@ if (videoModal && modalVideoPlayer) {
         }
     });
 
-    // Video ended
-    modalVideoPlayer.addEventListener('ended', () => {
+    // Audio ended
+    modalAudioPlayer.addEventListener('ended', () => {
         if (videoPlayBtn) {
             videoPlayBtn.innerHTML = '<span class="icon-play">&#9654;</span>';
         }
