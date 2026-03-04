@@ -978,6 +978,11 @@ toggleBtns.forEach(btn => {
                 el.classList.remove('scroll-hidden-bottom');
             });
         }
+
+        // 5. Re-init scroll items & kick animation so positions recalculate immediately
+        //    (fixes dim content when switching tabs — elements had stale positions)
+        initScrollItems();
+        requestAnimationFrame(() => kickScrollAnim());
     });
 });
 
