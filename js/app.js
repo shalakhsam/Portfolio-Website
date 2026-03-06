@@ -1424,30 +1424,41 @@ if (toolsStrip) {
             }
         }
 
-        // Get scroll amount (one poster width + gap)
-        function getScrollAmount() {
+        // Snap to exact poster on click, regardless of partial scroll
+        function scrollToItem(direction) {
             const firstItem = galleryContainer.querySelector('.gallery-item');
-            if (firstItem) {
-                const style = getComputedStyle(galleryContainer);
-                const gap = parseFloat(style.gap) || 0;
-                return firstItem.offsetWidth + gap;
+            if (!firstItem) return;
+
+            const style = getComputedStyle(galleryContainer);
+            const gap = parseFloat(style.gap) || 0;
+            const itemWidth = firstItem.offsetWidth + gap;
+            const currentScroll = galleryContainer.scrollLeft;
+
+            // Current scroll ratio (e.g. 1.25 means we've scrolled past 1 full poster + 25% of the next)
+            const scrollRatio = currentScroll / itemWidth;
+
+            let targetIndex;
+            if (direction === 'right') {
+                // If scrollRatio is 0.9 (poster 1 is 90% visible), Math.floor(0.9 + 0.15) = 1.
+                // targetIndex = 1 + 1 = 2 (Skip to poster 2 instead of 1)
+                targetIndex = Math.floor(scrollRatio + 0.15) + 1;
+            } else {
+                // If scrollRatio is 1.1 (poster 1 is 90% visible), Math.ceil(1.1 - 0.15) = 1.
+                // targetIndex = 1 - 1 = 0 (Skip back to poster 0 instead of 1)
+                targetIndex = Math.ceil(scrollRatio - 0.15) - 1;
             }
-            return 300;
+
+            // Ensure we don't go negative
+            targetIndex = Math.max(0, targetIndex);
+
+            galleryContainer.scrollTo({
+                left: targetIndex * itemWidth,
+                behavior: 'smooth'
+            });
         }
 
-        leftArrow.addEventListener('click', () => {
-            galleryContainer.scrollBy({
-                left: -getScrollAmount(),
-                behavior: 'smooth'
-            });
-        });
-
-        rightArrow.addEventListener('click', () => {
-            galleryContainer.scrollBy({
-                left: getScrollAmount(),
-                behavior: 'smooth'
-            });
-        });
+        leftArrow.addEventListener('click', () => scrollToItem('left'));
+        rightArrow.addEventListener('click', () => scrollToItem('right'));
 
         // Update arrows on scroll
         galleryContainer.addEventListener('scroll', updateGalleryArrows, { passive: true });

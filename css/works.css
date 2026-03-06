@@ -437,6 +437,15 @@
     justify-content: center;
 }
 
+/* Optically center the left chevron which has built-in font padding */
+.gallery-arrow-left span {
+    transform: translateX(-1px);
+}
+
+.gallery-arrow-left:hover span {
+    transform: translateX(-1px) scale(1.15);
+}
+
 .gallery-arrow-right {
     right: 0;
     justify-content: center;
@@ -909,16 +918,19 @@
     }
 
     .gallery-arrow {
-        /* Poster width 240px -> height 360px -> 180px center + 32px pad = 212px */
-        top: 212px;
+        /* Poster width 240px -> height 360px -> center 180px */
+        /* Center is padding + 180px */
+        top: calc(var(--spacing-md) + 180px);
     }
 
     .gallery-arrow-left {
-        left: -6px;
+        /* Center in 28px left margin (14px). Button is 44px so left is 14 - 22 = -8px */
+        left: -8px;
     }
 
     .gallery-arrow-right {
-        right: -6px;
+        /* Center in 28px right margin (14px). Button is 44px so right is 14 - 22 = -8px */
+        right: -8px;
     }
 
     /* Video Modal - full screen on mobile */
