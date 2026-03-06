@@ -391,14 +391,20 @@ h4 {
         white-space: normal;
         /* Allow wrap if absolutely needed */
     }
+}
 
-    /* HIDE Custom Cursor on Touch */
+/* HIDE Custom Cursor on Touch-Primary Devices (iPads, tablets — regardless of screen size) */
+@media (hover: none) and (pointer: coarse) {
+
     .cursor-dot,
     .cursor-outline {
         display: none !important;
     }
 
-    /* Revert global cursor:none for accessibility on touch interactions */
+    #trail-canvas {
+        display: none !important;
+    }
+
     *,
     *::before,
     *::after {

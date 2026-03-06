@@ -134,7 +134,7 @@ function updatePlayerUI(playing, title = null) {
         playIcon.innerHTML = '&#10074;&#10074;';
     } else {
         playIcon.className = 'icon-play';
-        playIcon.innerHTML = '&#9654;';
+        playIcon.innerHTML = '&#9654;&#xFE0E;';
     }
 
     if (playing) {
@@ -1133,7 +1133,7 @@ if (videoModal && modalAudioPlayer) {
         document.body.style.overflow = '';
         clearTimeout(controlsTimeout);
         if (videoPlayBtn) {
-            videoPlayBtn.innerHTML = '<span class="icon-play">&#9654;</span>';
+            videoPlayBtn.innerHTML = '<span class="icon-play">&#9654;&#xFE0E;</span>';
         }
         // Reset Seeker & Time
         if (videoSeekBar) videoSeekBar.style.width = '0%';
@@ -1176,7 +1176,7 @@ if (videoModal && modalAudioPlayer) {
 
     modalAudioPlayer.addEventListener('pause', () => {
         if (videoPlayBtn) {
-            videoPlayBtn.innerHTML = '<span class="icon-play">&#9654;</span>'; // Play icon
+            videoPlayBtn.innerHTML = '<span class="icon-play">&#9654;&#xFE0E;</span>'; // Play icon
         }
         showControls(); // Keep controls visible when paused
         clearTimeout(controlsTimeout); // Don't auto-hide when paused
@@ -1353,7 +1353,7 @@ if (videoModal && modalAudioPlayer) {
     // Audio ended
     modalAudioPlayer.addEventListener('ended', () => {
         if (videoPlayBtn) {
-            videoPlayBtn.innerHTML = '<span class="icon-play">&#9654;</span>';
+            videoPlayBtn.innerHTML = '<span class="icon-play">&#9654;&#xFE0E;</span>';
         }
         showControls();
         clearTimeout(controlsTimeout);
