@@ -913,6 +913,14 @@
         top: 212px;
     }
 
+    .gallery-arrow-left {
+        left: -6px;
+    }
+
+    .gallery-arrow-right {
+        right: -6px;
+    }
+
     /* Video Modal - full screen on mobile */
     .modal-content {
         width: 100%;
