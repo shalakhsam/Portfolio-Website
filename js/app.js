@@ -982,7 +982,11 @@ toggleBtns.forEach(btn => {
         // 5. Re-init scroll items & kick animation so positions recalculate immediately
         //    (fixes dim content when switching tabs — elements had stale positions)
         initScrollItems();
-        requestAnimationFrame(() => kickScrollAnim());
+        requestAnimationFrame(() => {
+            kickScrollAnim();
+            // Update gallery arrows after tab switch
+            if (window._updateGalleryArrows) window._updateGalleryArrows();
+        });
     });
 });
 
@@ -1372,52 +1376,90 @@ if (toolsStrip) {
     toolsObserver.observe(toolsStrip);
 }
 
-// Continuous smooth auto-scroll for gallery (all screen sizes)
+// Gallery Arrow Navigation
 {
     const galleryContainer = document.querySelector('#visual-works .gallery-scroll-container');
-    if (galleryContainer) {
-        let userInteracted = false;
-        let animationId;
-        const speed = 0.5; // Pixels per frame (adjust for speed)
+    const leftArrow = document.querySelector('.gallery-arrow-left');
+    const rightArrow = document.querySelector('.gallery-arrow-right');
 
-        const scrollLoop = () => {
-            if (userInteracted) return;
+    if (galleryContainer && leftArrow && rightArrow) {
+        function updateGalleryArrows() {
+            const { scrollLeft, scrollWidth, clientWidth } = galleryContainer;
+            const maxScroll = scrollWidth - clientWidth;
 
-            // Increment scroll
-            galleryContainer.scrollLeft += speed;
+            // Remove all fade classes first
+            galleryContainer.classList.remove('fade-left', 'fade-right', 'fade-both');
 
-            // Check if reached end
-            if (galleryContainer.scrollLeft >= galleryContainer.scrollWidth - galleryContainer.clientWidth - 1) {
-                galleryContainer.scrollLeft = 0; // Snap back to start (Loop)
+            // No overflow — hide both arrows, no fade
+            if (maxScroll <= 2) {
+                leftArrow.classList.add('hidden');
+                rightArrow.classList.add('hidden');
+                return;
             }
 
-            animationId = requestAnimationFrame(scrollLoop);
-        };
+            const atStart = scrollLeft <= 2;
+            const atEnd = scrollLeft >= maxScroll - 2;
 
-        const stopAutoScroll = () => {
-            userInteracted = true;
-            cancelAnimationFrame(animationId);
-        };
+            // Show/hide left arrow
+            if (atStart) {
+                leftArrow.classList.add('hidden');
+            } else {
+                leftArrow.classList.remove('hidden');
+            }
 
-        // Stop on any user touch/scroll interaction
-        galleryContainer.addEventListener('touchstart', stopAutoScroll, { passive: true });
-        galleryContainer.addEventListener('mousedown', stopAutoScroll);
+            // Show/hide right arrow
+            if (atEnd) {
+                rightArrow.classList.add('hidden');
+            } else {
+                rightArrow.classList.remove('hidden');
+            }
 
-        // Start only when visible
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && !userInteracted) {
-                    // Start loop
-                    if (!animationId) scrollLoop();
-                } else {
-                    // Pause loop (but don't set userInteracted, so it resumes if they scroll away and back)
-                    cancelAnimationFrame(animationId);
-                    animationId = null;
-                }
+            // Apply fade mask class
+            if (!atStart && !atEnd) {
+                galleryContainer.classList.add('fade-both');
+            } else if (!atStart) {
+                galleryContainer.classList.add('fade-left');
+            } else if (!atEnd) {
+                galleryContainer.classList.add('fade-right');
+            }
+        }
+
+        // Get scroll amount (one poster width + gap)
+        function getScrollAmount() {
+            const firstItem = galleryContainer.querySelector('.gallery-item');
+            if (firstItem) {
+                const style = getComputedStyle(galleryContainer);
+                const gap = parseFloat(style.gap) || 0;
+                return firstItem.offsetWidth + gap;
+            }
+            return 300;
+        }
+
+        leftArrow.addEventListener('click', () => {
+            galleryContainer.scrollBy({
+                left: -getScrollAmount(),
+                behavior: 'smooth'
             });
-        }, { threshold: 0.1 });
+        });
 
-        observer.observe(galleryContainer);
+        rightArrow.addEventListener('click', () => {
+            galleryContainer.scrollBy({
+                left: getScrollAmount(),
+                behavior: 'smooth'
+            });
+        });
+
+        // Update arrows on scroll
+        galleryContainer.addEventListener('scroll', updateGalleryArrows, { passive: true });
+
+        // Update arrows on resize
+        window.addEventListener('resize', updateGalleryArrows);
+
+        // Initial check
+        updateGalleryArrows();
+
+        // Expose for toggle logic (tab switch)
+        window._updateGalleryArrows = updateGalleryArrows;
     }
 }
 
