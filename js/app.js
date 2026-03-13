@@ -110,6 +110,13 @@ function playTrackByIndex(index) {
 
     updatePlayerUI(true, title);
     playerBar.classList.add('active'); // Slide up
+
+    // Compute clearance dynamically: Player height + generous 60px gap
+    document.body.classList.add('player-active');
+    setTimeout(() => {
+        const clearance = playerBar.offsetHeight + 40;
+        document.body.style.setProperty('--player-clearance', clearance + 'px');
+    }, 150); // Small delay ensures accurate measurement during CSS transition
 }
 
 function togglePlay() {

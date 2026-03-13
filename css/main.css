@@ -42,6 +42,11 @@ body {
     -webkit-font-smoothing: antialiased;
     touch-action: manipulation;
     /* Eliminates 300ms tap delay on mobile */
+    transition: padding-bottom 0.6s var(--ease-out-expo);
+}
+
+body.player-active {
+    padding-bottom: var(--player-clearance, 140px);
 }
 
 html {
