@@ -146,8 +146,10 @@ function updatePlayerUI(playing, title = null) {
 
     if (playing) {
         visualizer.style.opacity = '1';
+        visualizer.classList.add('playing');
     } else {
         visualizer.style.opacity = '0.5';
+        visualizer.classList.remove('playing');
     }
 }
 
@@ -1481,22 +1483,368 @@ if (toolsStrip) {
     }
 }
 
-// About section: Read More toggle on mobile
-const aboutContent = document.querySelector('.about-content');
+// About section: Read More → opens full bio overlay (all screen sizes)
+const bioOverlay = document.getElementById('bio-overlay');
+const bioCloseBtn = document.getElementById('bioCloseBtn');
+const bioBackdrop = bioOverlay ? bioOverlay.querySelector('.bio-overlay-backdrop') : null;
 const readMoreBtn = document.getElementById('aboutReadMore');
-const readMoreWrapper = document.getElementById('aboutReadMoreWrapper');
-if (readMoreBtn && aboutContent) {
-    if (window.innerWidth <= 768) {
-        aboutContent.classList.add('collapsed');
-        readMoreBtn.addEventListener('click', () => {
-            const isCollapsed = aboutContent.classList.toggle('collapsed');
-            readMoreBtn.textContent = isCollapsed ? 'Read More' : 'Read Less';
-            // Scroll back to top of about section when collapsing
-            if (isCollapsed) {
-                document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
+
+function openBioOverlay() {
+    if (!bioOverlay) return;
+    bioOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    // Focus the close button for accessibility
+    if (bioCloseBtn) bioCloseBtn.focus();
+}
+
+function closeBioOverlay() {
+    if (!bioOverlay) return;
+    bioOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+    // Return focus to the button that opened it
+    if (readMoreBtn) readMoreBtn.focus();
+}
+
+if (readMoreBtn) {
+    readMoreBtn.addEventListener('click', openBioOverlay);
+}
+
+if (bioCloseBtn) {
+    bioCloseBtn.addEventListener('click', closeBioOverlay);
+}
+
+if (bioBackdrop) {
+    bioBackdrop.addEventListener('click', closeBioOverlay);
+}
+
+// Escape key closes bio overlay
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && bioOverlay && bioOverlay.classList.contains('active')) {
+        closeBioOverlay();
+    }
+});
+
+/* =========================================
+   Collaboration Modal Logic
+   ========================================= */
+(function () {
+    var collabModal        = document.getElementById('collab-modal');
+    if (!collabModal) return;
+
+    var collabBackdrop     = collabModal.querySelector('.collab-modal-backdrop');
+    var collabCloseBtn     = collabModal.querySelector('.collab-modal-close');
+    var collabPoster       = document.getElementById('collab-modal-poster');
+    var collabMediaCont    = document.getElementById('collab-media-container');
+    var collabTitleEl      = document.getElementById('collab-modal-title');
+    var collabRoleEl       = document.getElementById('collab-modal-role');
+    var collabBriefEl      = document.getElementById('collab-modal-brief');
+    var collabApproachEl   = document.getElementById('collab-modal-approach');
+    var collabDirectorEl   = document.getElementById('collab-modal-director');
+
+    // Custom control elements
+    var collabCtrlBar      = document.getElementById('collab-video-controls');
+    var collabCtrlPlay     = document.getElementById('collab-ctrl-play');
+    var collabCtrlTime     = document.getElementById('collab-ctrl-time');
+    var collabCtrlSeek     = document.getElementById('collab-ctrl-seek');
+    var collabCtrlSeekBar  = document.getElementById('collab-ctrl-seek-bar');
+    var collabCtrlVolBtn   = document.getElementById('collab-ctrl-vol-btn');
+    var collabCtrlVolSlider= document.getElementById('collab-ctrl-vol-slider');
+    var collabCtrlVolWrap  = document.querySelector('.collab-ctrl-vol-wrapper');
+
+    var collabVid          = null; // active <video> element
+    var collabControlsTimeout = null;
+    var collabLastVol      = 1;
+    var isDraggingCollabSeek = false;
+
+    // --- Helpers ---
+    function formatTime(s) {
+        if (isNaN(s) || !isFinite(s)) return '0:00';
+        var m = Math.floor(s / 60);
+        var sec = Math.floor(s % 60);
+        return m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+
+    function isDirectVideo(url) {
+        return /\.(mp4|webm|mov|ogg|m4v)(\?.*)?$/i.test(url);
+    }
+
+    function toEmbedUrl(url) {
+        if (!url || url.indexOf('YOUR_') !== -1) return null;
+        var ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/))([A-Za-z0-9_-]{11})/);
+        if (ytMatch) return 'https://www.youtube.com/embed/' + ytMatch[1] + '?autoplay=1&rel=0';
+        var vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+        if (vimeoMatch) return 'https://player.vimeo.com/video/' + vimeoMatch[1] + '?autoplay=1';
+        return null;
+    }
+
+    function updateCollabVolumeSlider(val) {
+        if (!collabCtrlVolSlider) return;
+        var pct = val * 100;
+        collabCtrlVolSlider.style.background =
+            'linear-gradient(to right, var(--color-accent) ' + pct + '%, rgba(255,255,255,0.15) ' + pct + '%)';
+    }
+
+    function updateCollabVolumeIcon(vol) {
+        if (!collabCtrlVolBtn) return;
+        var svgBase = '<svg class="volume-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>';
+        if (vol === 0) {
+            collabCtrlVolBtn.innerHTML = svgBase + '<line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>';
+            collabCtrlVolBtn.style.opacity = '0.5';
+        } else if (vol < 0.5) {
+            collabCtrlVolBtn.innerHTML = svgBase + '<path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>';
+            collabCtrlVolBtn.style.opacity = '1';
+        } else {
+            collabCtrlVolBtn.innerHTML = svgBase + '<path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>';
+            collabCtrlVolBtn.style.opacity = '1';
+        }
+    }
+
+    function showCollabControls() {
+        if (!collabCtrlBar) return;
+        collabCtrlBar.classList.remove('hidden');
+        clearTimeout(collabControlsTimeout);
+        if (collabVid && !collabVid.paused) {
+            collabControlsTimeout = setTimeout(function () {
+                collabCtrlBar.classList.add('hidden');
+            }, 2500);
+        }
+    }
+
+    function getSeekPct(e, el) {
+        var rect = el.getBoundingClientRect();
+        var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    }
+
+    // --- Setup custom controls for a <video> element ---
+    function setupCollabControls(vid) {
+        collabVid = vid;
+        if (!collabCtrlBar) return;
+
+        // Show controls bar
+        if (collabCtrlBar) { collabCtrlBar.style.display = 'flex'; showCollabControls(); }
+
+        // Initialise volume slider
+        updateCollabVolumeSlider(1);
+        updateCollabVolumeIcon(1);
+
+        // Time / seek update (RAF-driven when playing)
+        function updateSeek() {
+            if (collabVid && !isDraggingCollabSeek && collabVid.duration) {
+                var pct = (collabVid.currentTime / collabVid.duration) * 100;
+                if (collabCtrlSeekBar) collabCtrlSeekBar.style.width = pct + '%';
+            }
+            if (collabVid && !collabVid.paused) requestAnimationFrame(updateSeek);
+        }
+
+        vid.addEventListener('play', function () {
+            if (collabCtrlPlay) collabCtrlPlay.innerHTML = '<span>&#10074;&#10074;</span>';
+            requestAnimationFrame(updateSeek);
+            showCollabControls();
+        });
+        vid.addEventListener('pause', function () {
+            if (collabCtrlPlay) collabCtrlPlay.innerHTML = '<span class="icon-play">&#9654;&#xFE0E;</span>';
+            showCollabControls();
+            clearTimeout(collabControlsTimeout);
+        });
+        vid.addEventListener('ended', function () {
+            if (collabCtrlPlay) collabCtrlPlay.innerHTML = '<span class="icon-play">&#9654;&#xFE0E;</span>';
+            if (collabCtrlSeekBar) collabCtrlSeekBar.style.width = '100%';
+            showCollabControls();
+            clearTimeout(collabControlsTimeout);
+        });
+        vid.addEventListener('timeupdate', function () {
+            if (collabCtrlTime && collabVid.duration) {
+                collabCtrlTime.textContent = formatTime(collabVid.currentTime) + ' / ' + formatTime(collabVid.duration);
             }
         });
-    } else {
-        if (readMoreWrapper) readMoreWrapper.style.display = 'none';
+
+        // Play / pause button
+        if (collabCtrlPlay) {
+            collabCtrlPlay.onclick = function (e) {
+                e.stopPropagation();
+                if (collabVid.paused) { collabVid.play(); } else { collabVid.pause(); }
+            };
+        }
+
+        // Click video to toggle
+        vid.addEventListener('click', function () {
+            if (collabVid.paused) { collabVid.play(); } else { collabVid.pause(); }
+            showCollabControls();
+        });
+
+        // Seek bar
+        if (collabCtrlSeek) {
+            collabCtrlSeek.addEventListener('mousedown', function (e) {
+                if (!collabVid.duration) return;
+                isDraggingCollabSeek = true;
+                var pct = getSeekPct(e, collabCtrlSeek);
+                if (collabCtrlSeekBar) collabCtrlSeekBar.style.width = (pct * 100) + '%';
+                e.stopPropagation();
+            });
+        }
+        window.addEventListener('mousemove', function (e) {
+            if (isDraggingCollabSeek && collabVid && collabVid.duration) {
+                var pct = getSeekPct(e, collabCtrlSeek);
+                if (collabCtrlSeekBar) collabCtrlSeekBar.style.width = (pct * 100) + '%';
+            }
+        });
+        window.addEventListener('mouseup', function (e) {
+            if (isDraggingCollabSeek) {
+                isDraggingCollabSeek = false;
+                if (collabVid && collabVid.duration) {
+                    collabVid.currentTime = getSeekPct(e, collabCtrlSeek) * collabVid.duration;
+                }
+            }
+        });
+
+        // Volume
+        if (collabCtrlVolSlider) {
+            collabCtrlVolSlider.addEventListener('input', function (e) {
+                var val = parseFloat(e.target.value);
+                if (collabVid) collabVid.volume = val;
+                updateCollabVolumeSlider(val);
+                updateCollabVolumeIcon(val);
+            });
+        }
+        if (collabCtrlVolBtn) {
+            collabCtrlVolBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (!collabVid) return;
+                if (collabVid.volume > 0) {
+                    collabLastVol = collabVid.volume;
+                    collabVid.volume = 0;
+                    if (collabCtrlVolSlider) collabCtrlVolSlider.value = 0;
+                } else {
+                    collabVid.volume = collabLastVol;
+                    if (collabCtrlVolSlider) collabCtrlVolSlider.value = collabLastVol;
+                }
+                updateCollabVolumeSlider(collabVid.volume);
+                updateCollabVolumeIcon(collabVid.volume);
+            });
+        }
+        // Hide cursor over volume slider
+        if (collabCtrlVolWrap) {
+            collabCtrlVolWrap.addEventListener('mouseenter', function () {
+                cursorDot.style.opacity = '0'; cursorOutline.style.opacity = '0';
+            });
+            collabCtrlVolWrap.addEventListener('mouseleave', function () {
+                cursorDot.style.opacity = '1'; cursorOutline.style.opacity = '1';
+            });
+        }
+
+        // Show controls on mouse move inside the left panel
+        var leftPanel = collabModal.querySelector('.collab-modal-left');
+        if (leftPanel) {
+            leftPanel.addEventListener('mousemove', function () {
+                if (collabModal.classList.contains('active')) showCollabControls();
+            });
+        }
+
+        // Space bar to toggle
+        document.addEventListener('keydown', function (e) {
+            if (e.key === ' ' && collabModal.classList.contains('active') && collabVid) {
+                e.preventDefault();
+                if (collabVid.paused) { collabVid.play(); } else { collabVid.pause(); }
+                showCollabControls();
+            }
+        });
     }
-}
+
+    // --- Open ---
+    function openCollabModal(card) {
+        var title    = card.getAttribute('data-title')     || '';
+        var role     = card.getAttribute('data-role')      || '';
+        var director = card.getAttribute('data-director')  || '';
+        var brief    = card.getAttribute('data-brief')     || '';
+        var approach = card.getAttribute('data-approach')  || '';
+        var poster   = card.getAttribute('data-poster')    || '';
+        var videoUrl = card.getAttribute('data-video-url') || '';
+
+        // Liner notes
+        if (collabTitleEl)    collabTitleEl.textContent    = title;
+        if (collabRoleEl)     collabRoleEl.textContent     = role;
+        if (collabBriefEl)    collabBriefEl.textContent    = brief;
+        if (collabApproachEl) collabApproachEl.textContent = approach;
+        if (collabDirectorEl) collabDirectorEl.textContent = director;
+
+        // Poster (initial state)
+        if (collabPoster) { collabPoster.src = poster; collabPoster.classList.remove('hidden'); }
+
+        // Reset controls
+        collabVid = null;
+        if (collabCtrlBar) { collabCtrlBar.style.display = 'none'; collabCtrlBar.classList.remove('hidden'); }
+        if (collabCtrlSeekBar) collabCtrlSeekBar.style.width = '0%';
+        if (collabCtrlTime) collabCtrlTime.textContent = '0:00 / 0:00';
+        if (collabCtrlVolSlider) { collabCtrlVolSlider.value = 1; updateCollabVolumeSlider(1); updateCollabVolumeIcon(1); }
+
+        // Media
+        if (collabMediaCont) {
+            collabMediaCont.innerHTML = '';
+            collabMediaCont.classList.remove('visible');
+
+            if (videoUrl && videoUrl.indexOf('YOUR_') === -1) {
+                if (isDirectVideo(videoUrl)) {
+                    // Direct video file → <video> + custom controls
+                    var vid = document.createElement('video');
+                    vid.src = videoUrl;
+                    vid.preload = 'metadata';
+                    collabMediaCont.appendChild(vid);
+                    collabMediaCont.classList.add('visible');
+                    if (collabPoster) collabPoster.classList.add('hidden');
+                    setupCollabControls(vid);
+                    vid.play().catch(function () {});
+                } else {
+                    // Embed URL (YouTube / Vimeo) → iframe
+                    var embedUrl = toEmbedUrl(videoUrl);
+                    if (embedUrl) {
+                        var iframe = document.createElement('iframe');
+                        iframe.src = embedUrl;
+                        iframe.title = title;
+                        iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+                        iframe.allowFullscreen = true;
+                        collabMediaCont.appendChild(iframe);
+                        collabMediaCont.classList.add('visible');
+                        if (collabPoster) collabPoster.classList.add('hidden');
+                    }
+                }
+            }
+        }
+
+        // Pause background audio
+        if (typeof audio !== 'undefined' && !audio.paused) {
+            audio.pause(); isPlaying = false; updatePlayerUI(false);
+        }
+        if (typeof modalAudioPlayer !== 'undefined' && !modalAudioPlayer.paused) {
+            modalAudioPlayer.pause();
+        }
+
+        collabModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // --- Close ---
+    function closeCollabModal() {
+        collabModal.classList.remove('active');
+        document.body.style.overflow = '';
+        clearTimeout(collabControlsTimeout);
+
+        if (collabVid) { collabVid.pause(); collabVid.src = ''; collabVid = null; }
+        if (collabMediaCont) { collabMediaCont.innerHTML = ''; collabMediaCont.classList.remove('visible'); }
+        if (collabPoster) { collabPoster.src = ''; collabPoster.classList.remove('hidden'); }
+        if (collabCtrlBar) { collabCtrlBar.style.display = 'none'; collabCtrlBar.classList.remove('hidden'); }
+    }
+
+    // Card clicks
+    document.querySelectorAll('.collab-card').forEach(function (card) {
+        card.addEventListener('click', function () { openCollabModal(card); });
+    });
+
+    // Close triggers
+    if (collabCloseBtn) collabCloseBtn.addEventListener('click', closeCollabModal);
+    if (collabBackdrop) collabBackdrop.addEventListener('click', closeCollabModal);
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && collabModal.classList.contains('active')) closeCollabModal();
+    });
+}());
+
